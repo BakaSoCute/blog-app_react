@@ -1,0 +1,15 @@
+.post_title {
+
+    font-size: 30px;
+    appearance: none;
+    margin: 0;
+}
+.post_body {
+    font-size: 20px;
+} 
+.post{
+    display: flex;
+    flex-direction: column;
+    justify-content: left;
+    appearance: none;
+}

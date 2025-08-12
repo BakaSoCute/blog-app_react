@@ -1,34 +1,84 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState , useEffect } from 'react'
+import AddPost from "./components/Posts/AddPost"
+import  { addTodo, getTodos, updateTodo, deleteTodo } from './api/todo'
+import {v4 as uuid4} from "uuid"
+
 import './App.css'
+import { Post } from './components/Posts/Post'
+import { getNormilizedPosts } from './utils/notmilize-post'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [todosIds, setTodosIds] = useState(null)
+  const [todosById, setTodosById] = useState({})
+  const [isTodosLoading, setTodosLoading] = useState(false)
+  const [isError , setError] = useState(false)
+  const [postTitle , setPostTitle] = useState("")
+  const [postBody , setPostBody] = useState("")
 
+  useEffect(() => {
+    setError(false)
+    setTodosLoading(true)
+
+    getTodos()
+      .then(todos => {
+        const [ids , byIds] = getNormilizedPosts(todos)
+
+
+        setTodosLoading(false)
+        setTodosIds(ids)
+        setTodosById(byIds)
+      })
+    
+      .catch(() => {
+        setError(true)
+        setTodosLoading(false)
+      });
+    
+  },[])
+  function onAddPost () {
+        const id = uuid4();
+        const todo = {
+          id,
+          title: postTitle,
+          body: postBody
+        }
+        setTodosById({
+          ...todosById,
+          [todo.id]: todo
+        })
+        setTodosIds([todo.id, ...todosIds])
+    
+    
+        addTodo(todo)
+  }
+  function onToggleTitle (e) {
+    setPostTitle(e.target.value)
+  }
+  function onToggleBody (e) {
+    setPostBody(e.target.value)
+  }
   return (
-    <>
+    <main className='main'>
       <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <AddPost 
+        title={"Новый пост"}
+        onAddPost={onAddPost}
+        onToggleTitle={onToggleTitle}
+        onToggleBody={onToggleBody}
+      />
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
+      <div>
+        <h2>Лента</h2>
+        <p className='isPostLoading'>{isTodosLoading && "Загрузка"}</p>
+        { todosIds &&todosIds.map(id => (
+          <Post
+          key={id}
+          post={todosById[id]}
+          />
+        ))}
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+
+    </main>
   )
 }
 

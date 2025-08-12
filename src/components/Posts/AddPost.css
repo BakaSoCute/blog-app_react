@@ -1,0 +1,13 @@
+.addpost{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.addpost_title{
+    width: 500px;
+    height: 60px;
+}
+.addpost_description{
+    width: 500px;
+    height: 260px;
+}
